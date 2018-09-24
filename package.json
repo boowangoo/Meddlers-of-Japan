@@ -1,0 +1,19 @@
+{
+  "name": "meddlers-of-japan",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "boowangoo",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^3.0.3"
+  },
+  "dependencies": {
+    "@types/uniqid": "^4.1.2",
+    "svg.js": "^2.6.6",
+    "uniqid": "^5.0.3"
+  }
+}
