@@ -51,10 +51,10 @@ export class GameBoardCtrl {
 
         const DIMS = gridLayout.length;
 
-        let grid: Array<Array<GameTileData>> = Array(DIMS).fill(null)
-                .map(() => Array(DIMS).fill(null));
+        let grid: Array<Array<GameTileData>> = [];
 
         for (let y = 0; y < DIMS; y++) {
+            grid.push([]);
             for (let x = 0; x < DIMS; x++) {
                 if (gridLayout[y][x] == 'L') {
                     const keys = Object.keys(tileCnt);
@@ -64,12 +64,12 @@ export class GameBoardCtrl {
                     } while (tileCnt[selectedType] < 1 || selectedType === 'SEA');
 
                     // console.log("selectedType:", selectedType)
-                    grid[y][x] = new GameTileData(TileType[selectedType]);
+                    grid[y].push(new GameTileData(TileType[selectedType]));
                     tileCnt[selectedType]--;
                     console.log(JSON.stringify(tileCnt));
                     console.log(selectedType);
                 } else {
-                    grid[y][x] = new GameTileData(TileType.SEA);
+                    grid[y].push(new GameTileData(TileType.SEA));
                 }
             }
         }

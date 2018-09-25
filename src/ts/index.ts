@@ -9,8 +9,7 @@
 
 // gt.hex.attr({ fill: pattern });
 
-import { BoardSize, TileType } from './constants'
-import { GameBoardCtrl } from './GameBoardCtrl'
+import { BoardSize } from './constants'
+import { GameBoard } from './GameBoard';
 
-const gbc = new GameBoardCtrl();
-console.log(gbc.makeGrid(BoardSize.SMALL).map(o1 => o1.map(o2 => TileType[o2.type])));
+const board = new GameBoard(BoardSize.SMALL);
