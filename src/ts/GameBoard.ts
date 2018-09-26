@@ -22,7 +22,7 @@ class GameBoard {
         for (let y = 0; y < DIMS; y++) {
             this._grid.push([]);
             for (let x = 0; x < DIMS; x++) {
-                this._grid[y].push(new GameTile(this._draw, gridData[y][x], 50, y, x));
+                this._grid[y].push(new GameTile(this._draw, gridData[y][x], 100, y, x));
             }
         }
     }
