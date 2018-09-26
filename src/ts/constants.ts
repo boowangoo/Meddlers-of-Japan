@@ -11,3 +11,4 @@ const largeTokens: Array<number> = [2, 5, 4, 6, 3, 9, 8, 11, 11, 10, 6, 3, 8, 4,
 
 export { BoardSize, TileType, ResourceType, SettlementType };
 export { EdgeLoc, VertexLoc };
+export { smallTokens, largeTokens };

@@ -9,19 +9,19 @@ import hillSVG from '../res/patterns/hill.svg';
 import mountainSVG from '../res/patterns/mountain.svg';
 import pastureSVG from '../res/patterns/pasture.svg';
 import seaSVG from '../res/patterns/sea.svg';
+import { BoardCoord, PixelCoord } from './newTypes';
 
 const svgPaths = { DESERT: desertSVG, FIELD: fieldSVG, FOREST: forestSVG, HILL: hillSVG, MOUNTAIN: mountainSVG, PASTURE: pastureSVG, SEA: seaSVG };
 
 class GameTile {
     private _data: GameTileData;
-    private _cx: number;
-    private _cy: number;
+    private _center: PixelCoord;
     private _path: Array<number>;
     
     private _hex: svgjs.Element;
     private _circle: svgjs.Element;
     
-	constructor(draw: svgjs.Container, data: GameTileData, width: number, y: number, x: number) {
+	constructor(draw: svgjs.Container, data: GameTileData, width: number, coord: BoardCoord) {
         this._data = data;
         
 		const sq3: number = Math.sqrt(3);
@@ -31,13 +31,15 @@ class GameTile {
                 .map(pt => wScale * pt);
 
         const h: number = width * 0.5 * sq3 - 0.5; // the -0.5 at the end is just for removing small gaps of the tiles
-        this._cx = y % 2 === 0 ? (x + 1) * width : (x + 0.5) * width;
-        this._cy = y * h + (width / sq3);
+        const cx = coord.y % 2 === 0 ? (coord.x + 1) * width : (coord.x + 0.5) * width;
+        const cy = coord.y * h + (width / sq3);
+        this._center = new PixelCoord(cy, cx);
+        console.log(this._center);
 
-        this._hex = draw.polygon(this._path).center(this._cx, this._cy).fill('#f00');
+        this._hex = draw.polygon(this._path).center(cx, cy).fill('#f00');
 
         if (this._data.type !== TileType.SEA && this._data.type !== TileType.DESERT) {
-            this._circle = draw.circle(width * 0.5).center(this._cx, this._cy).fill('#fff');
+            this._circle = draw.circle(width * 0.5).center(cx, cy).fill('#fff');
         }
         
         this.applyPattern(draw, this._data.type);
@@ -49,7 +51,12 @@ class GameTile {
         this._hex.attr({ fill: pattern })
     }
     
-    public get center(): Set<number> { return new Set([this._cx, this._cy]); }
+    public get center(): PixelCoord { return this._center; }
+    public get data(): GameTileData { return this._data; }
+
+    public setRollNum(draw: svgjs.Container, rollNum: number) {
+        draw.text(rollNum.toString());
+    }
 }
 
 export { GameTile };

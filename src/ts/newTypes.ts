@@ -8,5 +8,7 @@ class Coord {
     }
 };
 
-class BoardCoord extends Coord{};
-class PixelCoord extends Coord{};
+class BoardCoord extends Coord{ };
+class PixelCoord extends Coord{ };
+
+export { BoardCoord, PixelCoord };

@@ -1,11 +1,15 @@
-import { BoardSize, TileType, EdgeLoc, VertexLoc } from './constants'
+import { BoardSize, TileType, EdgeLoc, VertexLoc, smallTokens, largeTokens } from './constants'
 import { GameTileData, EdgeData, VertexData } from './GameTileCtrl'
+import { BoardCoord } from './newTypes';
 
 import * as boardDefaultSmall from '../res/boardDefaultSmall.json'
 import * as boardDefaultLarge from '../res/boardDefaultSmall.json'
+import { GameTile } from './GameTile';
 
 export class GameBoardCtrl {
-    private _neighour(grid: Array<Array<GameTileData>>, y: number, x: number) {
+    private _neighour(grid: Array<Array<GameTileData>>, coord: BoardCoord) {
+        const y = coord.y;
+        const x = coord.x;
         if (y % 2 === 0) {
             if (grid[y-1]) {
                 grid[y][x].changeEdge(EdgeLoc.TOP_L, grid[y-1][x]);
@@ -33,11 +37,45 @@ export class GameBoardCtrl {
                 }
             }
         }
-        if (grid[y][x-1]) {
+        if (grid[y] && grid[y][x-1]) {
             grid[y][x].changeEdge(EdgeLoc.MID_L, grid[y][x-1]);
         }
-        if (grid[y][x+1]) {
+        if (grid[y] && grid[y][x+1]) {
             grid[y][x].changeEdge(EdgeLoc.MID_R, grid[y][x+1]);
+        }
+    }
+
+    private _findFirstLandTile(grid: Array<Array<GameTileData>>): GameTileData {
+        const DIMS: number = grid.length;
+
+        for (let y = 0; y < DIMS; y++) {
+            for (let x = 0; x < DIMS; x++) {
+                if (grid[y][x].type !== TileType.SEA) {
+                    return grid[y][x];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public setTokens(grid: Array<Array<GameTileData>>, size: BoardSize) {
+        const tokens: Array<number> = size === BoardSize.SMALL ? smallTokens : largeTokens;
+        const placingDirs: Array<EdgeLoc> = [EdgeLoc.MID_R, EdgeLoc.BOT_R, EdgeLoc.BOT_L, EdgeLoc.MID_L, EdgeLoc.TOP_L, EdgeLoc.TOP_R];
+        
+        let pdIndex: number = 0;
+        let currTile: GameTileData = this._findFirstLandTile(grid);
+        let currDir: EdgeLoc = placingDirs[pdIndex];
+
+        while (tokens.length > 0) {
+            if (currTile.type !== TileType.DESERT) {
+                currTile.setToken(tokens.pop());
+            }
+            while (currTile.edges.get(currDir).tileData.type === TileType.SEA) {
+                pdIndex = (pdIndex + 1) % placingDirs.length;
+                currDir = placingDirs[pdIndex];
+            }
+            currTile = currTile.edges.get(currDir).tileData;
         }
     }
 
@@ -66,8 +104,8 @@ export class GameBoardCtrl {
                     // console.log("selectedType:", selectedType)
                     grid[y].push(new GameTileData(TileType[selectedType]));
                     tileCnt[selectedType]--;
-                    console.log(JSON.stringify(tileCnt));
-                    console.log(selectedType);
+                    // console.log(JSON.stringify(tileCnt));
+                    // console.log(selectedType);
                 } else {
                     grid[y].push(new GameTileData(TileType.SEA));
                 }
@@ -76,12 +114,14 @@ export class GameBoardCtrl {
 
         for (let y = 0; y < DIMS; y++) {
             for (let x = 0; x < DIMS; x++) {
-                this._neighour(grid, y, x);
+                this._neighour(grid, new BoardCoord(y, x));
             }
         }
 
         return grid;
     }
+
+    
 };
 
 // export { GameBoardCtrl };
