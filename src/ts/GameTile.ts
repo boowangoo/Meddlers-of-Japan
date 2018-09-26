@@ -34,12 +34,12 @@ class GameTile {
         const cx = coord.y % 2 === 0 ? (coord.x + 1) * width : (coord.x + 0.5) * width;
         const cy = coord.y * h + (width / sq3);
         this._center = new PixelCoord(cy, cx);
-        console.log(this._center);
+        // console.log(this._center);
 
         this._hex = draw.polygon(this._path).center(cx, cy).fill('#f00');
 
         if (this._data.type !== TileType.SEA && this._data.type !== TileType.DESERT) {
-            this._circle = draw.circle(width * 0.5).center(cx, cy).fill('#fff');
+            this._circle = draw.circle(width * 0.25).center(cx, cy).fill('#fff');
         }
         
         this.applyPattern(draw, this._data.type);
@@ -54,8 +54,9 @@ class GameTile {
     public get center(): PixelCoord { return this._center; }
     public get data(): GameTileData { return this._data; }
 
-    public setRollNum(draw: svgjs.Container, rollNum: number) {
-        draw.text(rollNum.toString());
+    public setToken(draw: svgjs.Container, tokenNum: number) {
+        this._data.setToken(tokenNum);
+        draw.text(tokenNum.toString()).center(this._center.x, this._center.y);
     }
 }
 

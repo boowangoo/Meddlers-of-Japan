@@ -2,6 +2,7 @@ import uniqid from 'uniqid';
 
 import { TileType, ResourceType, SettlementType } from './constants'
 import { EdgeLoc, VertexLoc } from './constants'
+import { BoardCoord } from './newTypes';
 
 class EdgeData {
     public tileData: GameTileData = null;
@@ -16,8 +17,9 @@ class VertexData {
 class GameTileData {
     // private _key: string = uniqid();
     private _type: TileType = null;
-    private _rollNum: number = null;
+    private _tokenNum: number = null;
     private _robbed: boolean = false;
+    private _coord: BoardCoord;
 
     private _edges = new Map<EdgeLoc, EdgeData>([
         [EdgeLoc.TOP_L, new EdgeData()],
@@ -36,13 +38,15 @@ class GameTileData {
         [VertexLoc.BOT_R, new VertexData()],
     ]);
 
-    constructor(type: TileType) {
+    constructor(type: TileType, coord: BoardCoord) {
         this._type = type ? type : TileType.SEA;
+        this._coord = coord;
     }
 
     // public get key(): string { return this._key; }
     public get type(): TileType { return this._type; }
-    public get rollNum(): number { return this._rollNum; }
+    public get coord(): BoardCoord { return this._coord; }
+    public get tokenNum(): number { return this._tokenNum; }
     public get robbed(): boolean { return this._robbed; }
     public get edges(): Map<EdgeLoc, EdgeData> { return this._edges; }
 
@@ -58,9 +62,7 @@ class GameTileData {
         if (type) { this._vertices.get(loc).type = type; }
         if (owner) { this._vertices.get(loc).owner = owner; }
     }
-    public setToken(tokenNum: number) {
-        this._rollNum = tokenNum;
-    }
+    public setToken(tokenNum: number) { this._tokenNum = tokenNum; }
 }
 
 export { EdgeData, VertexData, GameTileData };

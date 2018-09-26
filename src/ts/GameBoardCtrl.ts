@@ -45,39 +45,39 @@ export class GameBoardCtrl {
         }
     }
 
-    private _findFirstLandTile(grid: Array<Array<GameTileData>>): GameTileData {
-        const DIMS: number = grid.length;
+    // private _findFirstLandTile(grid: Array<Array<GameTileData>>): GameTileData {
+    //     const DIMS: number = grid.length;
 
-        for (let y = 0; y < DIMS; y++) {
-            for (let x = 0; x < DIMS; x++) {
-                if (grid[y][x].type !== TileType.SEA) {
-                    return grid[y][x];
-                }
-            }
-        }
+    //     for (let y = 0; y < DIMS; y++) {
+    //         for (let x = 0; x < DIMS; x++) {
+    //             if (grid[y][x].type !== TileType.SEA) {
+    //                 return grid[y][x];
+    //             }
+    //         }
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 
-    public setTokens(grid: Array<Array<GameTileData>>, size: BoardSize) {
-        const tokens: Array<number> = size === BoardSize.SMALL ? smallTokens : largeTokens;
-        const placingDirs: Array<EdgeLoc> = [EdgeLoc.MID_R, EdgeLoc.BOT_R, EdgeLoc.BOT_L, EdgeLoc.MID_L, EdgeLoc.TOP_L, EdgeLoc.TOP_R];
+    // public setTokens(grid: Array<Array<GameTileData>>, size: BoardSize) {
+    //     const tokens: Array<number> = size === BoardSize.SMALL ? smallTokens : largeTokens;
+    //     const placingDirs: Array<EdgeLoc> = [EdgeLoc.MID_R, EdgeLoc.BOT_R, EdgeLoc.BOT_L, EdgeLoc.MID_L, EdgeLoc.TOP_L, EdgeLoc.TOP_R];
         
-        let pdIndex: number = 0;
-        let currTile: GameTileData = this._findFirstLandTile(grid);
-        let currDir: EdgeLoc = placingDirs[pdIndex];
+    //     let pdIndex: number = 0;
+    //     let currTile: GameTileData = this._findFirstLandTile(grid);
+    //     let currDir: EdgeLoc = placingDirs[pdIndex];
 
-        while (tokens.length > 0) {
-            if (currTile.type !== TileType.DESERT) {
-                currTile.setToken(tokens.pop());
-            }
-            while (currTile.edges.get(currDir).tileData.type === TileType.SEA) {
-                pdIndex = (pdIndex + 1) % placingDirs.length;
-                currDir = placingDirs[pdIndex];
-            }
-            currTile = currTile.edges.get(currDir).tileData;
-        }
-    }
+    //     while (tokens.length > 0) {
+    //         if (currTile.type !== TileType.DESERT) {
+    //             currTile.setToken(tokens.pop());
+    //         }
+    //         while (currTile.edges.get(currDir).tileData.type === TileType.SEA) {
+    //             pdIndex = (pdIndex + 1) % placingDirs.length;
+    //             currDir = placingDirs[pdIndex];
+    //         }
+    //         currTile = currTile.edges.get(currDir).tileData;
+    //     }
+    // }
 
     public makeGrid(size: BoardSize): Array<Array<GameTileData>> {
         const tileCnt = size === BoardSize.SMALL
@@ -87,13 +87,11 @@ export class GameBoardCtrl {
         const gridLayout: Array<Array<string>> = size === BoardSize.SMALL
                 ? boardDefaultSmall.default : boardDefaultLarge.default;
 
-        const DIMS = gridLayout.length;
-
         let grid: Array<Array<GameTileData>> = [];
 
-        for (let y = 0; y < DIMS; y++) {
+        for (let y = 0; y < gridLayout.length; y++) {
             grid.push([]);
-            for (let x = 0; x < DIMS; x++) {
+            for (let x = 0; x < gridLayout[y].length; x++) {
                 if (gridLayout[y][x] == 'L') {
                     const keys = Object.keys(tileCnt);
                     let selectedType: string;
@@ -102,18 +100,18 @@ export class GameBoardCtrl {
                     } while (tileCnt[selectedType] < 1 || selectedType === 'SEA');
 
                     // console.log("selectedType:", selectedType)
-                    grid[y].push(new GameTileData(TileType[selectedType]));
+                    grid[y].push(new GameTileData(TileType[selectedType], new BoardCoord(y, x)));
                     tileCnt[selectedType]--;
                     // console.log(JSON.stringify(tileCnt));
                     // console.log(selectedType);
                 } else {
-                    grid[y].push(new GameTileData(TileType.SEA));
+                    grid[y].push(new GameTileData(TileType.SEA, new BoardCoord(y, x)));
                 }
             }
         }
 
-        for (let y = 0; y < DIMS; y++) {
-            for (let x = 0; x < DIMS; x++) {
+        for (let y = 0; y < gridLayout.length; y++) {
+            for (let x = 0; x < gridLayout[y].length; x++) {
                 this._neighour(grid, new BoardCoord(y, x));
             }
         }

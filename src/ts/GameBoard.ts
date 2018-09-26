@@ -1,6 +1,6 @@
-import SVG from 'svg.js';
+import SVG, { Container } from 'svg.js';
 
-import { BoardSize } from "./constants";
+import { BoardSize, TileType, smallTokens, largeTokens, EdgeLoc } from "./constants";
 import { GameBoardCtrl } from "./GameBoardCtrl";
 import { GameTileData } from "./GameTileCtrl";
 import { GameTile } from './GameTile';
@@ -19,27 +19,55 @@ class GameBoard {
 
         const gridData: Array<Array<GameTileData>> = this._gbc.makeGrid(this._size);
 
-        const DIMS = gridData.length;
-
         this._draw = SVG('drawing').size(800, 800);
 
         this._grid = [];
-        for (let y = 0; y < DIMS; y++) {
+        for (let y = 0; y < gridData.length; y++) {
             this._grid.push([]);
-            for (let x = 0; x < DIMS; x++) {
+            for (let x = 0; x < gridData[y].length; x++) {
                 this._grid[y].push(new GameTile(this._draw, gridData[y][x], 100, new BoardCoord(y, x)));
             }
         }
+
+        this._setAllTokens();
     }
 
-    private setTokens(gridData: Array<Array<GameTileData>>) {
-        this._gbc.setTokens(gridData, this._size);
-        const DIMS = this._grid.length;
+    private _findTile(coord: BoardCoord): GameTile { return this._grid[coord.y][coord.x]; }
 
-        for (let y = 0; y < DIMS; y++) {
-            for (let x = 0; x < DIMS; x++) {
-                this._grid[y][x].setRollNum(this._draw, this._grid[y][x].data.rollNum)
+    private _findFirstLandTile(): GameTile {
+        for (let y = 0; y < this._grid.length; y++) {
+            for (let x = 0; x < this._grid[y].length; x++) {
+                if (this._grid[y][x].data.type !== TileType.SEA) {
+                    return this._grid[y][x];
+                }
             }
+        }
+        return null;
+    }
+
+    private _setAllTokens() {
+        const tokens: Array<number> = this._size === BoardSize.SMALL ? smallTokens : largeTokens;
+        const placingDirs: Array<EdgeLoc> = [EdgeLoc.MID_R, EdgeLoc.BOT_R, EdgeLoc.BOT_L, EdgeLoc.MID_L, EdgeLoc.TOP_L, EdgeLoc.TOP_R];
+
+        let currTData: GameTileData = this._findFirstLandTile().data;
+        let pdIndex: number = 0;
+        let currDir: EdgeLoc = placingDirs[pdIndex];
+
+        let desertTraversed: boolean = false;
+        
+        while (tokens.length > 0) {
+            if (currTData.type !== TileType.DESERT) {
+                this._findTile(currTData.coord).setToken(this._draw, tokens.pop());
+            } else {
+                desertTraversed = true;
+            }
+            if (currTData.edges.get(currDir).tileData.type === TileType.SEA ||
+                    currTData.edges.get(currDir).tileData.tokenNum ||
+                        (currTData.edges.get(currDir).tileData.type === TileType.DESERT && desertTraversed)) {
+                pdIndex = (pdIndex + 1) % placingDirs.length;
+                currDir = placingDirs[pdIndex];
+            }
+            currTData = currTData.edges.get(currDir).tileData;
         }
     }
 
