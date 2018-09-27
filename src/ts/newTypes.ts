@@ -3,12 +3,12 @@ class Coord {
     public x: number;
 
     constructor(y: number, x: number) {
-        y = this.y;
-        x = this.x;
+        this.y = y;
+        this.x = x;
     }
 };
 
-class BoardCoord extends Coord{ };
-class PixelCoord extends Coord{ };
+class BoardCoord extends Coord{ constructor(y: number, x: number) { super(y, x); } };
+class PixelCoord extends Coord{ constructor(y: number, x: number) { super(y, x); } };
 
 export { BoardCoord, PixelCoord };
