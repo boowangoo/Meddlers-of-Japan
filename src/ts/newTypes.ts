@@ -1,3 +1,5 @@
+import { VertexLoc, EdgeLoc } from "./constants";
+
 class Coord {
     public y: number;
     public x: number;
@@ -8,7 +10,16 @@ class Coord {
     }
 };
 
-class BoardCoord extends Coord{ constructor(y: number, x: number) { super(y, x); } };
-class PixelCoord extends Coord{ constructor(y: number, x: number) { super(y, x); } };
+class BoardCoord extends Coord{
+    constructor(y: number, x: number) {
+        super(y, x);
+    }
+};
+
+class PixelCoord extends Coord{
+    constructor(y: number, x: number) {
+        super(y, x);
+    }
+};
 
 export { BoardCoord, PixelCoord };

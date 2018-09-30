@@ -10,39 +10,25 @@ class GameBoard {
     private _draw: svgjs.Container;
     private _gbc: GameBoardCtrl;
 
-    private _grid: Array<Array<GameTile>>;
-    private _size: BoardSize;
+    private _tileMap: Map<BoardCoord, GameTile> = new Map<BoardCoord, GameTile>();
 
     constructor(size: BoardSize) {
-        this._gbc = new GameBoardCtrl();
-        this._size = size;
+        this._gbc = new GameBoardCtrl(size);
 
-        const gridData: Array<Array<GameTileData>> = this._gbc.makeGrid(this._size);
-
-        const DIMS = gridData.length;
+        const tileData: Array<GameTileData> = this.gbc.makeTileData(size);
 
         this._draw = SVG('drawing').size(800, 800);
 
-        this._grid = [];
-        for (let y = 0; y < DIMS; y++) {
-            this._grid.push([]);
-            for (let x = 0; x < DIMS; x++) {
-                this._grid[y].push(new GameTile(this._draw, gridData[y][x], 100, new BoardCoord(y, x)));
-            }
-        }
+        tileData.map((d: GameTileData) => {
+            this.tileMap.set(d.coord, new GameTile(this._draw, 100, d));
+        });
+
+        this.gbc.setRollNums(this.draw, this.tileMap);
     }
 
-    private setTokens(gridData: Array<Array<GameTileData>>) {
-        this._gbc.setTokens(gridData, this._size);
-        const DIMS = this._grid.length;
-
-        for (let y = 0; y < DIMS; y++) {
-            for (let x = 0; x < DIMS; x++) {
-                this._grid[y][x].setRollNum(this._draw, this._grid[y][x].data.rollNum)
-            }
-        }
-    }
-
+    public get draw(): svgjs.Container { return this._draw; }
+    public get gbc(): GameBoardCtrl { return this._gbc; }
+    public get tileMap(): Map<BoardCoord, GameTile> { return this._tileMap; }
 };
 
 export { GameBoard };

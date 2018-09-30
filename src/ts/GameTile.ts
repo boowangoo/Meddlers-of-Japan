@@ -16,32 +16,25 @@ const svgPaths = { DESERT: desertSVG, FIELD: fieldSVG, FOREST: forestSVG, HILL: 
 class GameTile {
     private _data: GameTileData;
     private _center: PixelCoord;
-    private _path: Array<number>;
-    
+
     private _hex: svgjs.Element;
     private _circle: svgjs.Element;
-    
-	constructor(draw: svgjs.Container, data: GameTileData, width: number, coord: BoardCoord) {
+
+    constructor(draw: svgjs.Container, width: number, data: GameTileData) {
         this._data = data;
-        
-		const sq3: number = Math.sqrt(3);
+
+        const sq3: number = Math.sqrt(3);
 		const wScale: number = 0.5 * width / sq3;
 
-		this._path = [0, 2, sq3, 1, sq3, -1, 0, -2, -sq3, -1, -sq3, 1]
+		const path = [0, 2, sq3, 1, sq3, -1, 0, -2, -sq3, -1, -sq3, 1]
                 .map(pt => wScale * pt);
 
-        const h: number = width * 0.5 * sq3 - 0.5; // the -0.5 at the end is just for removing small gaps of the tiles
-        const cx = coord.y % 2 === 0 ? (coord.x + 1) * width : (coord.x + 0.5) * width;
-        const cy = coord.y * h + (width / sq3);
+        const cx = data.coord.x * width / 2;
+        const cy = data.coord.y * (width / sq3 / 2 - 0.5);
         this._center = new PixelCoord(cy, cx);
-        console.log(this._center);
 
-        this._hex = draw.polygon(this._path).center(cx, cy).fill('#f00');
+        this._hex = draw.polygon(path).center(cx, cy).fill('#f00');
 
-        if (this._data.type !== TileType.SEA && this._data.type !== TileType.DESERT) {
-            this._circle = draw.circle(width * 0.5).center(cx, cy).fill('#fff');
-        }
-        
         this.applyPattern(draw, this._data.type);
     }
 
@@ -50,13 +43,14 @@ class GameTile {
         let pattern: svgjs.Pattern = draw.pattern(tSize, tSize, add => { add.image(svgPaths[TileType[type]]).size(tSize, tSize) });
         this._hex.attr({ fill: pattern })
     }
-    
-    public get center(): PixelCoord { return this._center; }
-    public get data(): GameTileData { return this._data; }
 
     public setRollNum(draw: svgjs.Container, rollNum: number) {
-        draw.text(rollNum.toString());
+        draw.circle(30).center(this.center.x, this.center.y).fill('#fff');
+        draw.text(rollNum.toString()).center(this.center.x, this.center.y);
     }
+
+    public get center(): PixelCoord { return this._center; }
+    public get data(): GameTileData { return this._data; }
 }
 
 export { GameTile };
