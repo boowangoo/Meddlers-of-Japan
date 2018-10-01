@@ -35,7 +35,7 @@ class GameTile {
 
         this._hex = draw.polygon(path).center(cx, cy).fill('#f00');
 
-        this.applyPattern(draw, this._data.type);
+        this.applyPattern(draw, this._data.type, width);
     }
 
     private applyPattern(draw: svgjs.Container, type: TileType, tileSize?: number) {

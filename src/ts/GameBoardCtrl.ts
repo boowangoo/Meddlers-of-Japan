@@ -4,6 +4,7 @@ import { BoardCoord } from './newTypes';
 import { BoardSize, TileType, EdgeLoc, VertexLoc, smallTokens, largeTokens } from './constants';
 
 import boardTemplates from '../res/boardTemplates.json';
+import { Port, PortData } from './Port';
 
 class GameBoardCtrl {
     private _size: BoardSize;
@@ -27,7 +28,6 @@ class GameBoardCtrl {
     public makeTileData(size: BoardSize): Array<GameTileData> {
         const data: Array<GameTileData> = [];
 
-        
         let keys = Object.keys(this.tileCnt);
 
         let selectedType: string;
@@ -46,9 +46,11 @@ class GameBoardCtrl {
             this.tileCnt[selectedType]--;
         });
 
-        // console.log(this.boardTemplate.PORT);
-
         return data;
+    }
+
+    public getPortData() {
+        return this.boardTemplate.PORT;
     }
 
     public setRollNums(draw: svgjs.Container, tMap: Map<BoardCoord, GameTile>) {
