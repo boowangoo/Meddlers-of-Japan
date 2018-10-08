@@ -6,13 +6,14 @@ import { GameTileData } from "./GameTileCtrl";
 import { GameTile } from './GameTile';
 import { BoardCoord } from './newTypes';
 import { Port } from './Port';
+import { HoverBox } from './Hoverbox';
 
 class GameBoard {
     private _draw: svgjs.Container;
     private _gbc: GameBoardCtrl;
 
     private _tileMap: Map<BoardCoord, GameTile> = new Map<BoardCoord, GameTile>();
-    private _portData;
+    private _ports: Array<Port>;
 
     constructor(size: BoardSize) {
         this._gbc = new GameBoardCtrl(size);
@@ -26,15 +27,16 @@ class GameBoard {
         });
 
         this.gbc.setRollNums(this.draw, this.tileMap);
-        this._portData = this.gbc.getPortData();
 
-        new Port(this.draw, this.portData[0]);
+        this._ports = this.gbc.getPortData().map(p => new Port(this.draw, p));
+
+        new HoverBox(this.draw);
+        new HoverBox(this.draw, true);
     }
 
     public get draw(): svgjs.Container { return this._draw; }
     public get gbc(): GameBoardCtrl { return this._gbc; }
     public get tileMap(): Map<BoardCoord, GameTile> { return this._tileMap; }
-    public get portData() { return this._portData; }
 };
 
 export { GameBoard };

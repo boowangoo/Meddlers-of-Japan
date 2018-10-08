@@ -1,4 +1,6 @@
+import SVG from 'svg.js';
 import { BoardCoord, PixelCoord } from "./newTypes";
+import { Utils } from './utils';
 
 // import portSVG from '../res/port.svg';
 
@@ -13,27 +15,63 @@ class Port {
 
     constructor(draw: svgjs.Container, data: PortData) {
         let width = 100;
-
-        this._data = data;
-
         const sq3 = Math.sqrt(3);
+        
+        this._data = data;
+        
+        let pCenter: PixelCoord;
+        let pCenterIcon: PixelCoord;
+        let rot: number;
 
-        const pCenter = new PixelCoord(
-            (width / 2/ sq3) * (data.a.y + data.b.y) / 2,
-            (width / 2) * (data.a.x + data.b.x) / 2
-        );
+        if (data.a.x === data.b.x && data.a.y < data.b.y) {
+            pCenter = Utils.toPixels(data.a, width)
+                    .addCoord(Utils.toPixelYX(1, -0.25, width));
+            pCenterIcon = Utils.toPixels(data.a, width)
+                    .addCoord(Utils.toPixelYX(1, -1, width));
 
-        const pCenter2 = new PixelCoord(
-            (width / 2 / sq3) * (data.a.y - 0.875),
-            (width / 2) * (data.a.x + 0.64952 / sq3)
-        );
+            rot = -90;
+            
+        } else if (data.a.x === data.b.x && data.a.y > data.b.y) {
+            pCenter = Utils.toPixels(data.a, width)
+                    .addCoord(Utils.toPixelYX(-1, 0.25, width));
+            pCenterIcon = Utils.toPixels(data.a, width)
+                    .addCoord(Utils.toPixelYX(-1, 1, width));
 
-        console.log(data.a)
+            rot = 90;
 
-        // draw.circle(10).center(
-        //     (width / 2) * (data.a.x) + (0.64952 * width / sq3 / 2),
-        //     (width / 2 / sq3) * (data.a.y) - (0.875 * width / sq3 / 2)
-        // );
+        } else if (data.a.x < data.b.x && data.a.y < data.b.y) {
+            pCenter = Utils.toPixels(data.a, width)
+                    .addCoord(Utils.toPixelYX(0.875, 0.375, width));
+            pCenterIcon = Utils.toPixels(data.a, width)
+                    .addCoord(Utils.toPixelYX(2, 0, width));
+
+            rot = -150;
+
+        } else if (data.a.x < data.b.x && data.a.y > data.b.y) {
+            pCenter = Utils.toPixels(data.a, width)
+                    .addCoord(Utils.toPixelYX(-0.875, 0.375, width));
+            pCenterIcon = Utils.toPixels(data.a, width)
+                    .addCoord(Utils.toPixelYX(-2, 0, width));
+
+            rot = -30;
+
+        } else if (data.a.x > data.b.x && data.a.y < data.b.y) {
+            pCenter = Utils.toPixels(data.a, width)
+                    .addCoord(Utils.toPixelYX(0.875, -0.375, width));
+            pCenterIcon = Utils.toPixels(data.a, width)
+                    .addCoord(Utils.toPixelYX(2, 0, width));
+
+            rot = 150;
+
+        } else if (data.a.x > data.b.x && data.a.y > data.b.y) {
+            pCenter = Utils.toPixels(data.a, width)
+                    .addCoord(Utils.toPixelYX(-0.875, -0.375, width));
+            pCenterIcon = Utils.toPixels(data.a, width)
+                    .addCoord(Utils.toPixelYX(-2, 0, width));
+
+            rot = 30;
+
+        }
 
         draw.polygon([
             0, 0,
@@ -46,8 +84,11 @@ class Port {
             0.2, 0,
             1, 0
         ].map(n => n * width / 2))
-            .center(pCenter2.x, pCenter2.y)
-            .transform({rotation: -30})
+            .center(pCenter.x, pCenter.y)
+            .transform({ rotation: rot })
+            .fill('#863');
+
+        draw.circle(width / 2).center(pCenterIcon.x, pCenterIcon.y).fill('#fff');
     }
 }
 

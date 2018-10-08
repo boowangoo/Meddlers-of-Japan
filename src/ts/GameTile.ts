@@ -10,6 +10,7 @@ import mountainSVG from '../res/patterns/mountain.svg';
 import pastureSVG from '../res/patterns/pasture.svg';
 import seaSVG from '../res/patterns/sea.svg';
 import { BoardCoord, PixelCoord } from './newTypes';
+import { Utils } from './utils';
 
 const svgPaths = { DESERT: desertSVG, FIELD: fieldSVG, FOREST: forestSVG, HILL: hillSVG, MOUNTAIN: mountainSVG, PASTURE: pastureSVG, SEA: seaSVG };
 
@@ -22,18 +23,24 @@ class GameTile {
 
     constructor(draw: svgjs.Container, width: number, data: GameTileData) {
         this._data = data;
+        
+        this._center = Utils.toPixels(data.coord, width);
 
-        const sq3: number = Math.sqrt(3);
-		const wScale: number = 0.5 * width / sq3;
+        const cx: number = this.center.x;
+        const cy: number = this.center.y;
+        const unitX: number = Utils.toPixelX(1, width);
+        const unitY: number = Utils.toPixelY(1, width)
 
-		const path = [0, 2, sq3, 1, sq3, -1, 0, -2, -sq3, -1, -sq3, 1]
-                .map(pt => wScale * pt);
+		const path = [
+            cx, cy + 2 * unitY,
+            cx + unitX, cy + unitY,
+            cx + unitX, cy - unitY,
+            cx, cy - 2 * unitY,
+            cx - unitX, cy - unitY,
+            cx - unitX, cy + unitY
+        ]
 
-        const cx = data.coord.x * width / 2;
-        const cy = data.coord.y * (width / sq3 / 2 - 0.5);
-        this._center = new PixelCoord(cy, cx);
-
-        this._hex = draw.polygon(path).center(cx, cy).fill('#f00');
+        this._hex = draw.polygon(path).fill('#f00');
 
         this.applyPattern(draw, this._data.type, width);
     }
@@ -41,7 +48,7 @@ class GameTile {
     private applyPattern(draw: svgjs.Container, type: TileType, tileSize?: number) {
         const tSize: number = tileSize ? tileSize : 50;
         let pattern: svgjs.Pattern = draw.pattern(tSize, tSize, add => { add.image(svgPaths[TileType[type]]).size(tSize, tSize) });
-        this._hex.attr({ fill: pattern })
+        this._hex.fill(pattern);
     }
 
     public setRollNum(draw: svgjs.Container, rollNum: number) {

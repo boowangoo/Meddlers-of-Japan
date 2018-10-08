@@ -59,8 +59,7 @@ class GameBoardCtrl {
             const tile: GameTile = tMap.get(land);
 
             if (tile.data.type != TileType.DESERT) {
-                tile.setRollNum(draw, this.tokens[t]);
-                t++
+                tile.setRollNum(draw, this.tokens[t++]);
             }
         });
     }
